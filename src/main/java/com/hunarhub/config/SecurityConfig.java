@@ -32,7 +32,7 @@ public class SecurityConfig {
 
     // ✅ Read from environment variable, fallback to localhost for development
     @Value("${FRONTEND_URL:http://localhost:3000}")
-    private String frontendUrl;
+private String frontendUrl;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
