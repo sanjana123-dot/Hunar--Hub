@@ -1,8 +1,11 @@
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
+// ✅ Use env variable in production, fallback to localhost for development
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: process.env.REACT_APP_API_URL 
+    ? `${process.env.REACT_APP_API_URL}/api` 
+    : 'http://localhost:8080/api',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -23,18 +26,14 @@ api.interceptors.response.use(
     const isUnreadCountRequest = requestUrl.includes('/notifications/my/unread-count');
 
     if (status === 403) {
-      // Ignore unread-count auth failures during bootstrap; it should not block the UI.
       if (isUnreadCountRequest) {
         return Promise.reject(error);
       }
       toast.error('You are not authorized to access this resource');
     } else if (status === 401) {
-      // Clear auth data on 401
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       delete api.defaults.headers.common['Authorization'];
-
-      // Avoid forced redirect for non-critical unread count polling.
       if (!isUnreadCountRequest) {
         window.location.href = '/login';
       }
