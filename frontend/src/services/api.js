@@ -3,12 +3,9 @@ import { toast } from 'react-toastify';
 
 // ✅ Use env variable in production, fallback to localhost for development
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL 
-    ? `${process.env.REACT_APP_API_URL}/api` 
+  baseURL: process.env.REACT_APP_API_URL
+    ? `${process.env.REACT_APP_API_URL}/api`
     : 'http://localhost:8080/api',
-  headers: {
-    'Content-Type': 'application/json',
-  },
 });
 
 // Add token to requests if available
