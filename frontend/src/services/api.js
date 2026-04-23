@@ -1,10 +1,10 @@
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
-// ✅ Use env variable in production, fallback to localhost for development
+// ✅ Vite uses import.meta.env, NOT process.env
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL
-    ? `${process.env.REACT_APP_API_URL}/api`
+  baseURL: import.meta.env.VITE_API_URL
+    ? `${import.meta.env.VITE_API_URL}/api`
     : 'http://localhost:8080/api',
 });
 
@@ -23,17 +23,13 @@ api.interceptors.response.use(
     const isUnreadCountRequest = requestUrl.includes('/notifications/my/unread-count');
 
     if (status === 403) {
-      if (isUnreadCountRequest) {
-        return Promise.reject(error);
-      }
+      if (isUnreadCountRequest) return Promise.reject(error);
       toast.error('You are not authorized to access this resource');
     } else if (status === 401) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       delete api.defaults.headers.common['Authorization'];
-      if (!isUnreadCountRequest) {
-        window.location.href = '/login';
-      }
+      if (!isUnreadCountRequest) window.location.href = '/login';
     }
     return Promise.reject(error);
   }
