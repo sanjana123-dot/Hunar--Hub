@@ -1,13 +1,12 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { AuthProvider, AuthContext } from './context/AuthContext';
+import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import Navbar from './components/Navbar';
 import Login from './pages/Login';
 import Register from './pages/Register';
-import Home from './pages/Home';
 import Landing from './pages/Landing';
 import AuthenticatedHome from './pages/AuthenticatedHome';
 import EntrepreneurList from './pages/customer/EntrepreneurList';
@@ -26,8 +25,6 @@ import PrivateRoute from './components/PrivateRoute';
 function AppShell() {
   const location = useLocation();
   const isPublicHome = location.pathname === '/';
-   const { user } = useContext(AuthContext);
-
   return (
     <div className={isPublicHome ? 'App app-home' : 'App'}>
       <Navbar />

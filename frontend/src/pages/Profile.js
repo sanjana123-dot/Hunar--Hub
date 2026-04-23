@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-import api from '../services/api';
+import api, { resolveMediaUrl } from '../services/api';
 import { toast } from 'react-toastify';
 import './Profile.css';
 
@@ -440,7 +440,7 @@ const Profile = () => {
                 <div className="profile-details-header">
                   {profile.profilePhoto ? (
                     <img
-                      src={profile.profilePhoto.startsWith('http') ? profile.profilePhoto : `http://localhost:8080${profile.profilePhoto}`}
+                      src={resolveMediaUrl(profile.profilePhoto)}
                       alt="Profile"
                       className="profile-avatar"
                     />

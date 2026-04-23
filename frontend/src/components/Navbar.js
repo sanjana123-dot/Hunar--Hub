@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { CartContext } from '../context/CartContext';
 import api from '../services/api';
@@ -8,7 +8,6 @@ import './Navbar.css';
 const Navbar = () => {
   const { user, logout } = useContext(AuthContext);
   const { cartCount } = useContext(CartContext);
-  const navigate = useNavigate();
   const [unreadNotifications, setUnreadNotifications] = useState(0);
 
   useEffect(() => {

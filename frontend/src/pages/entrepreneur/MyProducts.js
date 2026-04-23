@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
-import api from '../../services/api';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import api, { resolveMediaUrl } from '../../services/api';
 import { toast } from 'react-toastify';
 import Pagination from '../../components/Pagination';
 import ImageUpload from '../../components/ImageUpload';
@@ -81,10 +81,6 @@ const MyProducts = () => {
   const editFormRef = useRef(null);
 
   useEffect(() => {
-    fetchProducts();
-  }, [page]);
-
-  useEffect(() => {
     api.get('/categories').then(res => setCategories(res.data || [])).catch(() => setCategories([]));
     api.get('/profile')
       .then(res => setBusinessCategory((res.data?.businessCategory || '').trim()))
@@ -104,7 +100,7 @@ const MyProducts = () => {
     return [...base, { id: nid, name: label }];
   }, [categories, formData.categoryId, selectedCategoryName]);
 
-  const fetchProducts = async () => {
+  const fetchProducts = useCallback(async () => {
     setLoading(true);
     try {
       const response = await api.get('/entrepreneur/products', {
@@ -121,7 +117,11 @@ const MyProducts = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [page, size]);
+
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
 
 
   const handleSubmit = async (e) => {
@@ -1242,7 +1242,7 @@ const MyProducts = () => {
         {data.content.map(product => (
           <div key={product.id} className="card">
             {product.imageUrl && (
-              <img src={product.imageUrl} alt={product.name} style={{ width: '100%', maxHeight: '200px', objectFit: 'cover', objectPosition: 'top center', borderRadius: '4px', marginBottom: '10px' }} />
+              <img src={resolveMediaUrl(product.imageUrl)} alt={product.name} style={{ width: '100%', maxHeight: '200px', objectFit: 'cover', objectPosition: 'top center', borderRadius: '4px', marginBottom: '10px' }} />
             )}
             <h3>{product.name}</h3>
             <p>{product.description}</p>

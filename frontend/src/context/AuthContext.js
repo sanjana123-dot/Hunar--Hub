@@ -3,6 +3,19 @@ import api from '../services/api';
 
 export const AuthContext = createContext();
 
+function messageFromAxiosError(error, fallback) {
+  const data = error.response?.data;
+  if (data == null) return error.message || fallback;
+  if (typeof data.message === 'string' && data.message.trim()) return data.message;
+  if (typeof data === 'object' && !Array.isArray(data)) {
+    const first = Object.values(data).find(
+      (v) => typeof v === 'string' && v.trim()
+    );
+    if (first) return first;
+  }
+  return fallback;
+}
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -56,9 +69,9 @@ export const AuthProvider = ({ children }) => {
       
       return { success: true, user: userData };
     } catch (error) {
-      return { 
-        success: false, 
-        message: error.response?.data?.message || 'Login failed' 
+      return {
+        success: false,
+        message: messageFromAxiosError(error, 'Login failed'),
       };
     }
   };
@@ -75,9 +88,9 @@ export const AuthProvider = ({ children }) => {
       
       return { success: true };
     } catch (error) {
-      return { 
-        success: false, 
-        message: error.response?.data?.message || 'Registration failed' 
+      return {
+        success: false,
+        message: messageFromAxiosError(error, 'Registration failed'),
       };
     }
   };

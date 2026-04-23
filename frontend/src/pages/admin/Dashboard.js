@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Routes, Route, Link, useLocation } from 'react-router-dom';
 import PendingEntrepreneurs from './PendingEntrepreneurs';
 import Entrepreneurs from './Entrepreneurs';

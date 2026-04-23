@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import api from '../../services/api';
 import { toast } from 'react-toastify';
 import './DisputeManagement.css';
@@ -10,11 +10,7 @@ const DisputeManagement = () => {
   const [statusFilter, setStatusFilter] = useState('');
   const [adminResponse, setAdminResponse] = useState('');
 
-  useEffect(() => {
-    fetchDisputes();
-  }, [statusFilter]);
-
-  const fetchDisputes = async () => {
+  const fetchDisputes = useCallback(async () => {
     try {
       const url = statusFilter 
         ? `/admin/disputes?status=${statusFilter}`
@@ -27,7 +23,11 @@ const DisputeManagement = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [statusFilter]);
+
+  useEffect(() => {
+    fetchDisputes();
+  }, [fetchDisputes]);
 
   const handleStatusUpdate = async (disputeId, newStatus) => {
     try {

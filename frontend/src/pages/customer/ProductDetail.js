@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { useParams, useNavigate, Link, useLocation } from 'react-router-dom';
-import api from '../../services/api';
+import api, { resolveMediaUrl } from '../../services/api';
 import { CartContext } from '../../context/CartContext';
 import { toast } from 'react-toastify';
 import './ProductDetail.css';
@@ -68,7 +68,9 @@ const ProductDetail = () => {
     ...(product.additionalImageUrls
       ? product.additionalImageUrls.split(',').map(s => s.trim()).filter(Boolean)
       : []),
-  ].filter(Boolean);
+  ]
+    .filter(Boolean)
+    .map(resolveMediaUrl);
 
   const handleAddToCart = () => {
     addToCart({ ...product, selectedSize }, 1);

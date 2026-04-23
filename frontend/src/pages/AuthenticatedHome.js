@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useContext, useRef } from 'react';
+import React, { useState, useEffect, useContext, useRef, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { CartContext } from '../context/CartContext';
-import api from '../services/api';
+import api, { resolveMediaUrl } from '../services/api';
 import { toast } from 'react-toastify';
 import Pagination from '../components/Pagination';
 import './AuthenticatedHome.css';
@@ -25,27 +25,7 @@ const AuthenticatedHome = () => {
     api.get('/categories').then(res => setCategories(res.data || [])).catch(() => setCategories([]));
   }, []);
 
-  useEffect(() => {
-    fetchProducts();
-  }, [page, search, selectedCategory]);
-
-  useEffect(() => {
-    if (categories.length) {
-      categories.forEach(cat => fetchProductsByCategory(cat.id));
-    }
-  }, [categories]);
-
-  useEffect(() => {
-    const onFocus = () => {
-      if (categories.length) {
-        categories.forEach(cat => fetchProductsByCategory(cat.id));
-      }
-    };
-    window.addEventListener('focus', onFocus);
-    return () => window.removeEventListener('focus', onFocus);
-  }, [categories]);
-
-  const fetchProducts = async () => {
+  const fetchProducts = useCallback(async () => {
     setLoading(true);
     try {
       const params = { page, size };
@@ -62,9 +42,9 @@ const AuthenticatedHome = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [page, search, selectedCategory, size]);
 
-  const fetchProductsByCategory = async (categoryId) => {
+  const fetchProductsByCategory = useCallback(async (categoryId) => {
     try {
       const response = await api.get('/products', { params: { categoryId, page: 0, size: 4 } });
       const data = response.data;
@@ -73,7 +53,27 @@ const AuthenticatedHome = () => {
     } catch {
       setCategoryProducts(prev => ({ ...prev, [categoryId]: [] }));
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
+
+  useEffect(() => {
+    if (categories.length) {
+      categories.forEach(cat => fetchProductsByCategory(cat.id));
+    }
+  }, [categories, fetchProductsByCategory]);
+
+  useEffect(() => {
+    const onFocus = () => {
+      if (categories.length) {
+        categories.forEach(cat => fetchProductsByCategory(cat.id));
+      }
+    };
+    window.addEventListener('focus', onFocus);
+    return () => window.removeEventListener('focus', onFocus);
+  }, [categories, fetchProductsByCategory]);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -185,7 +185,7 @@ const AuthenticatedHome = () => {
                           <div key={p ? p.id : `ph-${cat.id}-${i}`} className="category-card-cell">
                             {p ? (
                               p.imageUrl ? (
-                                <img src={p.imageUrl} alt={p.name} />
+                                <img src={resolveMediaUrl(p.imageUrl)} alt={p.name} />
                               ) : (
                                 <div className="category-card-placeholder" />
                               )
@@ -233,7 +233,7 @@ const AuthenticatedHome = () => {
                       >
                         {product.imageUrl ? (
                           <div className="product-image-wrapper">
-                            <img src={product.imageUrl} alt={product.name} className="product-image" />
+                            <img src={resolveMediaUrl(product.imageUrl)} alt={product.name} className="product-image" />
                           </div>
                         ) : (
                           <div className="product-image-placeholder" />

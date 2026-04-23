@@ -1,7 +1,8 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { CartContext } from '../context/CartContext';
+import { resolveMediaUrl } from '../services/api';
 import './Cart.css';
 
 const Cart = () => {
@@ -35,7 +36,7 @@ const Cart = () => {
               <div key={item.product.id} className="cart-item">
                 <div className="cart-item-image">
                   {item.product.imageUrl ? (
-                    <img src={item.product.imageUrl} alt={item.product.name} />
+                    <img src={resolveMediaUrl(item.product.imageUrl)} alt={item.product.name} />
                   ) : (
                     <div className="cart-item-placeholder" />
                   )}

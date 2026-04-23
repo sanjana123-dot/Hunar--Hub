@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import api from '../services/api';
+import api, { resolveMediaUrl } from '../services/api';
 import { toast } from 'react-toastify';
 import './ImageUpload.css';
 
@@ -62,7 +62,7 @@ const ImageUpload = ({ onUploadSuccess, currentImageUrl }) => {
     <div className="image-upload">
       {preview && (
         <div className="image-preview">
-          <img src={preview} alt="Preview" />
+          <img src={resolveMediaUrl(preview)} alt="Preview" />
         </div>
       )}
       <label className="upload-label">

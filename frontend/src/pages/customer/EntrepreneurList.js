@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../../services/api';
 import Pagination from '../../components/Pagination';
@@ -11,11 +11,7 @@ const EntrepreneurList = () => {
   const [size] = useState(12);
   const [search, setSearch] = useState('');
 
-  useEffect(() => {
-    fetchEntrepreneurs();
-  }, [page, search]);
-
-  const fetchEntrepreneurs = async () => {
+  const fetchEntrepreneurs = useCallback(async () => {
     setLoading(true);
     try {
       const params = { page, size };
@@ -34,7 +30,11 @@ const EntrepreneurList = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [page, search, size]);
+
+  useEffect(() => {
+    fetchEntrepreneurs();
+  }, [fetchEntrepreneurs]);
 
   const handleSearch = (e) => {
     e.preventDefault();

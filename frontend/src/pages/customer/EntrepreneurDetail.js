@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { CartContext } from '../../context/CartContext';
-import api from '../../services/api';
+import api, { resolveMediaUrl } from '../../services/api';
 import { toast } from 'react-toastify';
 import './EntrepreneurDetail.css';
 
@@ -24,13 +24,7 @@ const EntrepreneurDetail = () => {
   const isCustomer = currentUser?.role === 'CUSTOMER';
   const isCobbler = (entrepreneur?.businessCategory || '').toLowerCase().includes('cobbler');
 
-  useEffect(() => {
-    fetchEntrepreneur();
-    fetchProducts();
-    fetchReviews();
-  }, [id]);
-
-  const fetchEntrepreneur = async () => {
+  const fetchEntrepreneur = useCallback(async () => {
     try {
       const response = await api.get(`/entrepreneurs/${id}`);
       setEntrepreneur(response.data);
@@ -39,18 +33,18 @@ const EntrepreneurDetail = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
 
-  const fetchProducts = async () => {
+  const fetchProducts = useCallback(async () => {
     try {
       const response = await api.get(`/entrepreneurs/${id}/products`);
       setProducts(response.data);
     } catch (error) {
       console.error('Error fetching products:', error);
     }
-  };
+  }, [id]);
 
-  const fetchReviews = async () => {
+  const fetchReviews = useCallback(async () => {
     try {
       const response = await api.get(`/entrepreneurs/${id}/reviews`);
       setReviews(response.data || []);
@@ -58,7 +52,13 @@ const EntrepreneurDetail = () => {
       console.error('Error fetching reviews:', error);
       setReviews([]);
     }
-  };
+  }, [id]);
+
+  useEffect(() => {
+    fetchEntrepreneur();
+    fetchProducts();
+    fetchReviews();
+  }, [fetchEntrepreneur, fetchProducts, fetchReviews]);
 
   const handleServiceRequest = async (e) => {
     e.preventDefault();
@@ -182,7 +182,7 @@ const EntrepreneurDetail = () => {
                 <p>{product.description}</p>
                 <p><strong>Price:</strong> ₹{product.price}</p>
                 {product.imageUrl && (
-                  <img src={product.imageUrl} alt={product.name} style={{ maxWidth: '100%', height: 'auto' }} />
+                  <img src={resolveMediaUrl(product.imageUrl)} alt={product.name} style={{ maxWidth: '100%', height: 'auto' }} />
                 )}
                 {product.available ? (
                   isCobbler ? (

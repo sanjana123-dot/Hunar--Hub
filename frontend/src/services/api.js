@@ -1,10 +1,29 @@
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
+/** Backend origin without `/api` (same host the browser uses for REST and `/uploads`). */
+export function getBackendPublicOrigin() {
+  const base = process.env.REACT_APP_API_URL;
+  if (base && String(base).trim()) {
+    return String(base).replace(/\/+$/, '');
+  }
+  return 'http://localhost:8080';
+}
+
+/** Prefix relative `/uploads/...` paths with the configured backend origin for production. */
+export function resolveMediaUrl(url) {
+  if (url == null || typeof url !== 'string') return url;
+  const u = url.trim();
+  if (!u) return url;
+  if (u.startsWith('data:') || /^https?:\/\//i.test(u)) return u;
+  if (u.startsWith('/uploads/')) {
+    return `${getBackendPublicOrigin()}${u}`;
+  }
+  return u;
+}
+
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL
-    ? `${process.env.REACT_APP_API_URL}/api`
-    : 'http://localhost:8080/api',
+  baseURL: `${getBackendPublicOrigin()}/api`,
   headers: {
     'Content-Type': 'application/json',
   },
